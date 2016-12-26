@@ -22,11 +22,19 @@ set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-add_custom_command(TARGET ${PROJECT_NAME} 
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data
-    COMMENT "copy tests data files"
-)
+if(MSVC)
+    add_custom_command(TARGET ${PROJECT_NAME} 
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/data
+        COMMENT "copy tests data files"
+    )
+else()
+    add_custom_command(TARGET ${PROJECT_NAME} 
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data
+        COMMENT "copy tests data files"
+    )
+endif()
 
 target_link_libraries(${PROJECT_NAME} asn1)
 target_link_libraries(${PROJECT_NAME} gtest)
