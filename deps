@@ -1,0 +1,6 @@
+optional https://github.com/andrewstalin/optional.git
+babel https://github.com/andrewstalin/babel.git
+liberror https://github.com/andrewstalin/liberror.git
+iostreams https://github.com/andrewstalin/iostreams.git
+gtest https://github.com/google/googletest
+cmake-modules https://github.com/andrewstalin/cmake-modules.git
