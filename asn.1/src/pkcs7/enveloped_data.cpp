@@ -60,10 +60,10 @@ length_type pkcs7::StreamingEnvelopedData::encode_last_part(const IEncoder& enco
 pkcs7::EnvelopedDataDecoder::EnvelopedDataDecoder(const Tag& tag, IValueEventHandler* const event_handler)
 	: details::SequenceBasedTypeDecoder<EnvelopedData>(tag, event_handler)
 	, version_decoder(&decoded_element_event_handler_)
-	, originator_info(&decoded_element_event_handler_)
+	, originator_info(ORIGINATOR_INFO_TAG, &decoded_element_event_handler_)
 	, recipient_infos_decoder(&decoded_element_event_handler_)
 	, encrypted_content_info_decoder(&decoded_element_event_handler_)
-	, unprotected_attributes(&decoded_element_event_handler_)
+	, unprotected_attributes(UNPROTECTED_ATTRIBUTES_TAG, &decoded_element_event_handler_)
 {
 	reserve(5);
 	add(&version_decoder);
@@ -76,10 +76,10 @@ pkcs7::EnvelopedDataDecoder::EnvelopedDataDecoder(const Tag& tag, IValueEventHan
 pkcs7::EnvelopedDataDecoder::EnvelopedDataDecoder(const Tag& tag, IValueEventHandler* const event_handler, IDataEventHandler* const data_event_handler)
 	: details::SequenceBasedTypeDecoder<EnvelopedData>(tag, event_handler)
 	, version_decoder(&decoded_element_event_handler_)
-	, originator_info(&decoded_element_event_handler_)
+	, originator_info(ORIGINATOR_INFO_TAG, &decoded_element_event_handler_)
 	, recipient_infos_decoder(&decoded_element_event_handler_)
 	, encrypted_content_info_decoder(&decoded_element_event_handler_, data_event_handler)
-	, unprotected_attributes(&decoded_element_event_handler_)
+	, unprotected_attributes(UNPROTECTED_ATTRIBUTES_TAG, &decoded_element_event_handler_)
 {
 	reserve(5);
 	add(&version_decoder);

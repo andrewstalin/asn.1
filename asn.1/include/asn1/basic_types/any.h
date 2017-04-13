@@ -90,6 +90,18 @@ namespace asn1
 			, constructed_type_event_handler_(this)
 		{}
 
+		AnyDecoder(const Tag& tag, IValueEventHandler* const event_handler) noexcept
+			: BerDecoder(tag)
+			, value_event_handler_(event_handler)
+			, constructed_type_event_handler_(this)
+		{}
+
+		AnyDecoder(const Tag& tag, IDataEventHandler* const event_handler) noexcept
+			: BerDecoder(tag)
+			, data_event_handler_(event_handler)
+			, constructed_type_event_handler_(this)
+		{}
+
 		bool finished() const override { return state_ == State::COMPLETED; }
 
 		void reset_state() override
