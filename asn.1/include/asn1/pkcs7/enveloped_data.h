@@ -78,19 +78,12 @@ namespace asn1
 
 		class EnvelopedDataDecoder : public details::SequenceBasedTypeDecoder<EnvelopedData>
 		{
-		private:
-			enum class State
-			{
-				VERSION_DECODING,
-				RECIPIENT_INFOS_DECODING,
-				ENCRYPTED_CONTENT_INFO_DECODING
-			};
-			State state_{ State::VERSION_DECODING };
-
 		public:
 			IntegerDecoder version_decoder;
 			RecipientInfoCollectionDecoder recipient_infos_decoder;
 			EncryptedContentInfoDecoder encrypted_content_info_decoder;
+			AnyDecoder originator_info;
+			AnyDecoder unprotected_attributes;
 
 			explicit EnvelopedDataDecoder(IValueEventHandler* const event_handler)
 				: EnvelopedDataDecoder(SEQUENCE_TAG, event_handler)
@@ -102,12 +95,6 @@ namespace asn1
 
 			EnvelopedDataDecoder(const Tag& tag, IValueEventHandler* const event_handler);
 			EnvelopedDataDecoder(const Tag& tag, IValueEventHandler* const event_handler, IDataEventHandler* const data_event_handler);
-
-			void reset_state() override
-			{
-				details::SequenceBasedTypeDecoder<EnvelopedData>::reset_state();
-				state_ = State::VERSION_DECODING;
-			}
 
 		protected:
 			void on_decode_element(Asn1Value&& val) override;

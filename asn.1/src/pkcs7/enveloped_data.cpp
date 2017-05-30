@@ -13,6 +13,9 @@
 
 using namespace asn1;
 
+static constexpr Tag ORIGINATOR_INFO_TAG = { EncodingForm::CONSTRUCTED, TagClass::CONTEXT_SPECIFIC, 0 };
+static constexpr Tag UNPROTECTED_ATTRIBUTES_TAG = { EncodingForm::CONSTRUCTED, TagClass::CONTEXT_SPECIFIC, 1 };
+
 length_type pkcs7::EnvelopedData::encode(const IEncoder& encoder, io::IAsn1Writer& writer) const
 {
 	return encoder.encode_collection(writer, tag,
@@ -57,43 +60,47 @@ length_type pkcs7::StreamingEnvelopedData::encode_last_part(const IEncoder& enco
 pkcs7::EnvelopedDataDecoder::EnvelopedDataDecoder(const Tag& tag, IValueEventHandler* const event_handler)
 	: details::SequenceBasedTypeDecoder<EnvelopedData>(tag, event_handler)
 	, version_decoder(&decoded_element_event_handler_)
+	, originator_info(ORIGINATOR_INFO_TAG, &decoded_element_event_handler_)
 	, recipient_infos_decoder(&decoded_element_event_handler_)
 	, encrypted_content_info_decoder(&decoded_element_event_handler_)
+	, unprotected_attributes(UNPROTECTED_ATTRIBUTES_TAG, &decoded_element_event_handler_)
 {
-	add({ 
-		&version_decoder,
-		&recipient_infos_decoder,
-		&encrypted_content_info_decoder
-	});
+	reserve(5);
+	add(&version_decoder);
+	add_optional(&originator_info);
+	add(&recipient_infos_decoder);
+	add(&encrypted_content_info_decoder);
+	add_optional(&unprotected_attributes);
 }
 
 pkcs7::EnvelopedDataDecoder::EnvelopedDataDecoder(const Tag& tag, IValueEventHandler* const event_handler, IDataEventHandler* const data_event_handler)
 	: details::SequenceBasedTypeDecoder<EnvelopedData>(tag, event_handler)
 	, version_decoder(&decoded_element_event_handler_)
+	, originator_info(ORIGINATOR_INFO_TAG, &decoded_element_event_handler_)
 	, recipient_infos_decoder(&decoded_element_event_handler_)
 	, encrypted_content_info_decoder(&decoded_element_event_handler_, data_event_handler)
+	, unprotected_attributes(UNPROTECTED_ATTRIBUTES_TAG, &decoded_element_event_handler_)
 {
-	add({
-		&version_decoder,
-		&recipient_infos_decoder,
-		&encrypted_content_info_decoder
-	});
+	reserve(5);
+	add(&version_decoder);
+	add_optional(&originator_info);
+	add(&recipient_infos_decoder);
+	add(&encrypted_content_info_decoder);
+	add_optional(&unprotected_attributes);
 }
 
 void pkcs7::EnvelopedDataDecoder::on_decode_element(Asn1Value&& val)
 {
-	switch (state_)
+	if (val.tag == INTEGER_TAG)
 	{
-	case State::VERSION_DECODING:
 		decoded_value_.version = static_cast<Integer&&>(val);
-		state_ = State::RECIPIENT_INFOS_DECODING;
-		break;
-	case State::RECIPIENT_INFOS_DECODING:
+	}
+	else if (val.tag == SET_TAG)
+	{
 		decoded_value_.recipient_infos = static_cast<RecipientInfoCollection&&>(val);
-		state_ = State::ENCRYPTED_CONTENT_INFO_DECODING;
-		break;
-	case State::ENCRYPTED_CONTENT_INFO_DECODING:
+	}
+	else if (val.tag == SEQUENCE_TAG)
+	{
 		decoded_value_.encrypted_content_info = static_cast<EncryptedContentInfo&&>(val);
-		break;
 	}
 }
