@@ -47,8 +47,15 @@ namespace asn1
 		class AlgorithmIdentifierDecoder : public details::SequenceBasedTypeDecoder<AlgorithmIdentifier>
 		{
 		private:
+			enum class State : uint8_t
+			{
+				ALGORITHM_DECODING,
+				PARAMETERS_DECODING
+			};
+
 			ObjectIdentifierDecoder algorithm_decoder_;
 			AnyDecoder parameters_decoder_;
+			State state_{ State::ALGORITHM_DECODING };
 
 		public:
 			explicit AlgorithmIdentifierDecoder(IValueEventHandler* const event_handler)
@@ -56,6 +63,12 @@ namespace asn1
 			{}
 
 			AlgorithmIdentifierDecoder(const Tag& tag, IValueEventHandler* const event_handler);
+
+			void reset_state() override
+			{
+				details::SequenceBasedTypeDecoder<AlgorithmIdentifier>::reset_state();
+				state_ = State::ALGORITHM_DECODING;
+			}
 
 		protected:
 			void on_decode_element(Asn1Value&& val) override;

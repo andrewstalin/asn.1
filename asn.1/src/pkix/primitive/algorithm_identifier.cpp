@@ -45,13 +45,15 @@ pkix::AlgorithmIdentifierDecoder::AlgorithmIdentifierDecoder(const Tag& tag, IVa
 
 void pkix::AlgorithmIdentifierDecoder::on_decode_element(Asn1Value&& val)
 {
-	if (val.tag == OBJECT_IDENTIFIER_TAG)
+	switch (state_)
 	{
+	case State::ALGORITHM_DECODING:
 		decoded_value_.algorithm = static_cast<ObjectIdentifier&&>(val);
-	}
-	else
-	{
+		state_ = State::PARAMETERS_DECODING;
+		break;
+	case State::PARAMETERS_DECODING:
 		assert(!decoded_value_.algorithm.numbers.empty());
 		decoded_value_.parameters = static_cast<Any&&>(val);
+		break;
 	}
 }

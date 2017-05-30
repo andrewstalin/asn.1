@@ -14,7 +14,7 @@ set_compiler_options()
 set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY INCLUDE_DIRECTORIES 
     ${CMAKE_SOURCE_DIR}/asn.1/include
     ${CMAKE_SOURCE_DIR}/asn.1/src
-    ${CMAKE_SOURCE_DIR}/3rdparty/gtest/include
+    ${CMAKE_SOURCE_DIR}/3rdparty/gtest/googletest/include
     ${CMAKE_SOURCE_DIR}/3rdparty/babel/babel/include
     ${CMAKE_SOURCE_DIR}/3rdparty/optional/optional/include
     ${CMAKE_SOURCE_DIR}/3rdparty/iostreams/iostreams/include
