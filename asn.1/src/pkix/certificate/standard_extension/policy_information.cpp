@@ -47,7 +47,7 @@ void pkix::cert::PolicyInformationDecoder::on_decode_element(Asn1Value&& val)
 	{
 		decoded_value_.policy_id = static_cast<ObjectIdentifier&&>(val);
 	}
-	else
+	else if (val.tag == SEQUENCE_TAG)
 	{
 		decoded_value_.policy_qualifiers = static_cast<SequenceOf<PolicyQualifierInfo>&&>(val);
 	}

@@ -84,15 +84,8 @@ namespace asn1
 		class EncapsulatedContentInfoDecoder : public details::SequenceBasedTypeDecoder<EncapsulatedContentInfo>
 		{
 		private:
-			enum class State
-			{
-				CONTENT_TYPE_OID_DECODING,
-				CONTENT_DECODING
-			};
-
 			ObjectIdentifierDecoder content_type_oid_decoder_;
 			ExplicitDecoder<OctetStringDecoder> content_decoder_;
-			State state_{ State::CONTENT_TYPE_OID_DECODING };
 
 		public:
 			explicit EncapsulatedContentInfoDecoder(IValueEventHandler* const event_handler)
@@ -105,12 +98,6 @@ namespace asn1
 
 			EncapsulatedContentInfoDecoder(const Tag& tag, IValueEventHandler* const event_handler);
 			EncapsulatedContentInfoDecoder(const Tag& tag, IValueEventHandler* const event_handler, IDataEventHandler* const data_event_handler);
-
-			void reset_state() override
-			{
-				details::SequenceBasedTypeDecoder<EncapsulatedContentInfo>::reset_state();
-				state_ = State::CONTENT_TYPE_OID_DECODING;
-			}
 
 		protected:
 			void on_decode_element(Asn1Value&& val) override

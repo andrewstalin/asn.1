@@ -43,8 +43,16 @@ namespace asn1
 		class AttributeTypeAndValueDecoder : public details::SequenceBasedTypeDecoder<AttributeTypeAndValue>
 		{
 		private:
+			enum class State : uint8_t
+			{
+				TYPE_DECODING,
+				VALUE_DECODING,
+				FINAL
+			};
+
 			ObjectIdentifierDecoder type_decoder;
 			AnyDecoder value_decoder_;
+			State state_{ State::TYPE_DECODING };
 
 		public:
 			explicit AttributeTypeAndValueDecoder(IValueEventHandler* const event_handler)
@@ -52,7 +60,13 @@ namespace asn1
 			{}
 			
 			AttributeTypeAndValueDecoder(const Tag& tag, IValueEventHandler* const event_handle);
-				
+			
+			void reset_state() override
+			{
+				details::SequenceBasedTypeDecoder<AttributeTypeAndValue>::reset_state();
+				state_ = State::TYPE_DECODING;
+			}
+
 		protected:
 			void on_decode_element(Asn1Value&& val) override;
 			void on_decode_element(const Tag&, Asn1Value&&) override {}

@@ -54,16 +54,8 @@ namespace asn1
 		class IssuerAndSerialNumberDecoder : public details::SequenceBasedTypeDecoder<IssuerAndSerialNumber>
 		{
 		private:
-		private:
-			enum class State : uint8_t
-			{
-				ISSUER_DECODING,
-				SERIAL_NUMBER_DECODING
-			};
-
 			pkix::NameDecoder issuer_decoder_;
 			IntegerDecoder serial_number_decoder_;
-			State state_{ State::ISSUER_DECODING };
 
 		public:
 			explicit IssuerAndSerialNumberDecoder(IValueEventHandler* const event_handler)
@@ -80,22 +72,15 @@ namespace asn1
 					&serial_number_decoder_
 				});
 			}
-			
-			void reset_state() override
-			{
-				details::SequenceBasedTypeDecoder<IssuerAndSerialNumber>::reset_state();
-				state_ = State::ISSUER_DECODING;
-			}
 
 		protected:
 			void on_decode_element(Asn1Value&& val) override
 			{
-				if (state_ == State::ISSUER_DECODING)
+				if (val.tag == SEQUENCE_TAG)
 				{
 					decoded_value_.issuer = static_cast<pkix::Name&&>(val);
-					state_ = State::SERIAL_NUMBER_DECODING;
 				}
-				else
+				else if (val.tag == INTEGER_TAG)
 				{
 					decoded_value_.serial_number = static_cast<Integer&&>(val);
 				}

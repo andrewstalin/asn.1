@@ -10,6 +10,7 @@
 // SOFTWARE.
 
 #include "asn1/pkix/primitive/attribute_type_and_value.h"
+#include <cassert>
 
 using namespace asn1;
 
@@ -35,12 +36,17 @@ pkix::AttributeTypeAndValueDecoder::AttributeTypeAndValueDecoder(const Tag& tag,
 
 void pkix::AttributeTypeAndValueDecoder::on_decode_element(Asn1Value&& val)
 {
-	if (val.tag == OBJECT_IDENTIFIER_TAG)
+	assert(state_ != State::FINAL);
+
+	switch (state_)
 	{
+	case State::TYPE_DECODING:
 		decoded_value_.type = static_cast<ObjectIdentifier&&>(val);
-	}
-	else
-	{
+		state_ = State::VALUE_DECODING;
+		break;
+	case State::VALUE_DECODING:
 		decoded_value_.value = static_cast<Any&&>(val);
+		state_ = State::FINAL;
+		break;
 	}
 }

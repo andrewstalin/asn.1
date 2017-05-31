@@ -97,15 +97,8 @@ namespace asn1
 		class ContentInfoDecoder : public details::SequenceBasedTypeDecoder<ContentInfo<content_type>>
 		{
 		private:
-			enum class State
-			{
-				CONTENT_TYPE_OID_DECODING,
-				PKCS7_CONTENT_DECODING
-			};
-
 			ObjectIdentifierDecoder content_type_oid_decoder_;
 			ExplicitDecoder<decoder_type> pkcs7_content_decoder_;
-			State state_{ State::CONTENT_TYPE_OID_DECODING };
 
 		public:
 			explicit ContentInfoDecoder(IValueEventHandler* const event_handler)
@@ -120,12 +113,6 @@ namespace asn1
 			ContentInfoDecoder(const Tag& tag, IValueEventHandler* const event_handler, IDataEventHandler* const data_event_handler);
 
 			const ExplicitDecoder<decoder_type>& pkcs7_content_decoder() const { return pkcs7_content_decoder_; }
-
-			void reset_state() override
-			{
-				details::SequenceBasedTypeDecoder<ContentInfo<content_type>>::reset_state();
-				state_ = State::CONTENT_TYPE_OID_DECODING;
-			}
 
 		protected:
 			void on_decode_element(Asn1Value&& val) override

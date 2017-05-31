@@ -45,6 +45,8 @@ pkix::AlgorithmIdentifierDecoder::AlgorithmIdentifierDecoder(const Tag& tag, IVa
 
 void pkix::AlgorithmIdentifierDecoder::on_decode_element(Asn1Value&& val)
 {
+	assert(state_ != State::FINAL);
+
 	switch (state_)
 	{
 	case State::ALGORITHM_DECODING:
@@ -52,8 +54,8 @@ void pkix::AlgorithmIdentifierDecoder::on_decode_element(Asn1Value&& val)
 		state_ = State::PARAMETERS_DECODING;
 		break;
 	case State::PARAMETERS_DECODING:
-		assert(!decoded_value_.algorithm.numbers.empty());
 		decoded_value_.parameters = static_cast<Any&&>(val);
+		state_ = State::FINAL;
 		break;
 	}
 }

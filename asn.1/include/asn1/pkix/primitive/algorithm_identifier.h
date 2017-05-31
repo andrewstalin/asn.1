@@ -50,7 +50,8 @@ namespace asn1
 			enum class State : uint8_t
 			{
 				ALGORITHM_DECODING,
-				PARAMETERS_DECODING
+				PARAMETERS_DECODING,
+				FINAL
 			};
 
 			ObjectIdentifierDecoder algorithm_decoder_;
